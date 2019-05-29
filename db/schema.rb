@@ -10,12 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_24_121414) do
+ActiveRecord::Schema.define(version: 2019_05_29_110507) do
+
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "locatables", force: :cascade do |t|
-    t.integer "location_id"
+    t.bigint "location_id"
     t.string "locatable_type"
-    t.integer "locatable_id"
+    t.bigint "locatable_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["locatable_type", "locatable_id"], name: "index_locatables_on_locatable_type_and_locatable_id"
@@ -38,7 +41,7 @@ ActiveRecord::Schema.define(version: 2019_05_24_121414) do
   create_table "roles", force: :cascade do |t|
     t.string "name"
     t.string "resource_type"
-    t.integer "resource_id"
+    t.bigint "resource_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name", "resource_type", "resource_id"], name: "index_roles_on_name_and_resource_type_and_resource_id"
@@ -60,7 +63,7 @@ ActiveRecord::Schema.define(version: 2019_05_24_121414) do
     t.datetime "invitation_accepted_at"
     t.integer "invitation_limit"
     t.string "invited_by_type"
-    t.integer "invited_by_id"
+    t.bigint "invited_by_id"
     t.integer "invitations_count", default: 0
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["invitation_token"], name: "index_users_on_invitation_token", unique: true
@@ -71,22 +74,26 @@ ActiveRecord::Schema.define(version: 2019_05_24_121414) do
   end
 
   create_table "users_projects", force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "project_id"
-    t.integer "role_id"
+    t.bigint "user_id"
+    t.bigint "project_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "role_id"
     t.index ["project_id"], name: "index_users_projects_on_project_id"
     t.index ["role_id"], name: "index_users_projects_on_role_id"
     t.index ["user_id"], name: "index_users_projects_on_user_id"
   end
 
   create_table "users_roles", id: false, force: :cascade do |t|
-    t.integer "user_id"
-    t.integer "role_id"
+    t.bigint "user_id"
+    t.bigint "role_id"
     t.index ["role_id"], name: "index_users_roles_on_role_id"
     t.index ["user_id", "role_id"], name: "index_users_roles_on_user_id_and_role_id"
     t.index ["user_id"], name: "index_users_roles_on_user_id"
   end
 
+  add_foreign_key "locatables", "locations"
+  add_foreign_key "users_projects", "projects"
+  add_foreign_key "users_projects", "roles"
+  add_foreign_key "users_projects", "users"
 end
